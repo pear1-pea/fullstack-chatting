@@ -1,0 +1,34 @@
+# macOS system files
+.DS_Store
+
+# Qt Creator user-specific configuration files
+*.user
+*.pro.user
+*.qbs.user
+*.creator.*
+*.autosave
+
+# Build directories and CMake build artifacts
+build/
+CMakeBuild/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Ninja build system files
+.ninja*
+rules.ninja
+build.ninja
+
+# VS Code configuration (optional)
+.vscode/
+
+# Compiled binaries and libraries
+*.out
+*.app
+*.exe
+*.dll
+*.so
+*.dylib
