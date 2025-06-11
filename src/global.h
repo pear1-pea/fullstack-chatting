@@ -9,6 +9,7 @@
 #include <mutex>
 #include <QByteArray>
 #include <QNetworkReply>
+#include <QString>
 /*********************************************************************
 * @file       global.h
 * @brief      用来刷新qss
@@ -19,6 +20,7 @@
 **********************************************************************/
 
 extern std::function<void(QWidget*)> repolish;
+extern QString gate_url_prefix;
 
 enum ReqId{
   ID_GET_VARIFY_CODE =1001,//获取验证码

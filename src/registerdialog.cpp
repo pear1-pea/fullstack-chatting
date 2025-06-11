@@ -1,6 +1,8 @@
 #include "registerdialog.h"
 #include "ui_registerdialog.h"
 #include "httpmgr.h"
+#include "global.h"
+
 RegisterDialog::RegisterDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::RegisterDialog)
@@ -29,6 +31,10 @@ void RegisterDialog::on_get_code_clicked()
     bool match =regex.match(email).hasMatch();
     if(match){
         //发送http验证码
+        QJsonObject json_obj;
+        json_obj["email"]=email;
+        HttpMgr::GetInstance()->PostHttpReq(QUrl(gate_url_prefix+"/get_varifycode"),
+                                            json_obj,ReqId::ID_GET_VARIFY_CODE,Modules::REGISTERMOD);
     }else{
         showTip(tr("邮箱地址不正确"),false);
     }

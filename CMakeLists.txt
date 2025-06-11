@@ -56,6 +56,21 @@ target_link_libraries(fullstack-chatting
         Qt${QT_VERSION_MAJOR}::Network
 )
 
+# 配置文件拷贝
+if(APPLE)
+    set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:fullstack-chatting>/../Resources")
+else()
+    set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:fullstack-chatting>")
+endif()
+
+add_custom_command(TARGET fullstack-chatting POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CONFIG_DEST_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy
+        "${CMAKE_SOURCE_DIR}/config.ini"
+        "${CONFIG_DEST_DIR}/config.ini"
+    COMMENT "Copying config.ini to output directory"
+)
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
