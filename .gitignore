@@ -33,3 +33,5 @@ build.ninja
 *.dll
 *.so
 *.dylib
+
+.cache/
