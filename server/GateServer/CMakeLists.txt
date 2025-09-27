@@ -13,6 +13,7 @@ endif()
 # set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(VCPKG_TARGET_TRIPLET "arm64-osx" CACHE STRING "")
+set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:gateserver>")
 
 # 查找所需的包
 find_package(Boost REQUIRED COMPONENTS system thread)
@@ -55,20 +56,26 @@ file(MAKE_DIRECTORY ${PROTO_OUTPUT_DIR})
 # 定义生成的源文件和头文件的完整路径
 set(PROTO_GENERATED_SRC ${PROTO_OUTPUT_DIR}/message.pb.cc)
 set(PROTO_GENERATED_HDR ${PROTO_OUTPUT_DIR}/message.pb.h)
-
+set(GRPC_GENERATED_SRC ${PROTO_OUTPUT_DIR}/message.grpc.pb.cc)
+set(GRPC_GENERATED_HDR ${PROTO_OUTPUT_DIR}/message.grpc.pb.h)
 # 执行 Protobuf 编译命令
 # COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_FLAGS} --cpp_out=${PROTO_OUTPUT_DIR} ${PROTO_SRC_FILE}
 # 使用 add_custom_command 来确保每次构建时都会检查 .proto 文件是否有更新
 add_custom_command(
-    OUTPUT ${PROTO_GENERATED_SRC} ${PROTO_GENERATED_HDR}
+    OUTPUT ${PROTO_GENERATED_SRC} ${PROTO_GENERATED_HDR} ${GRPC_GENERATED_SRC} ${GRPC_GENERATED_HDR}
     COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS ${PROTO_FLAGS} --cpp_out=${PROTO_OUTPUT_DIR} ${PROTO_SRC_FILE}
+    ARGS 
+        ${PROTO_FLAGS} 
+        --cpp_out=${PROTO_OUTPUT_DIR} 
+        --grpc_out=${PROTO_OUTPUT_DIR}
+        --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN_EXECUTABLE}
+        ${PROTO_SRC_FILE}
     DEPENDS ${PROTO_SRC_FILE}
     VERBATIM
 )
 
 # 将生成的源文件添加到项目编译列表中
-set(PROTO_SRCS ${PROTO_GENERATED_SRC})
+set(PROTO_SRCS ${PROTO_GENERATED_SRC} ${GRPC_GENERATED_SRC})
 
 
 
@@ -112,6 +119,8 @@ add_executable(gateserver
     src/LogicSystem.cpp
     src/LogicSystem.h
     src/Singleton.h
+    src/VarifyGrpcClient.h
+    src/VarifyGrpcClient.cc
     ${PROTO_SRCS}
     # ${GRPC_SRCS}
 )
@@ -131,4 +140,12 @@ target_include_directories(gateserver PRIVATE
     ${VCPKG_INSTALLED_DIR}/arm64-osx/include
     ${PROTO_OUTPUT_DIR} 
     ${PROTOBUF_INCLUDE_DIRS} 
+)
+
+add_custom_command(TARGET gateserver POST_BUILD
+    # COMMAND ${CMAKE_COMMAND} -E make_directory "${CONFIG_DEST_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/config.ini"
+        "${CONFIG_DEST_DIR}/config.ini"
+    COMMENT "Copying config.ini to output directory"
 )

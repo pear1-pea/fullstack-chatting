@@ -1,9 +1,6 @@
 #include "LogicSystem.h"
 #include "HttpConnection.h"
-#include "const.h"
-#include <boost/beast/core/buffers_to_string.hpp>
-#include <boost/beast/http/fields_fwd.hpp>
-
+#include "VarifyGrpcClient.h"
 LogicSystem::~LogicSystem() {
 }
 
@@ -34,16 +31,17 @@ LogicSystem::LogicSystem(){
             std::cout<<"Failed to parse JSON data!"<<std::endl;
             root["error"]=ErrorCodes::Error_Json;
             Json::StreamWriterBuilder writer;
-            std::string jsonstr = Json::writeString(writer, root);
+            std::string jsonstr = root.toStyledString();
             beast::ostream(connection->_response.body())<<jsonstr;
             return true;
         }
+
         auto email = src_root["email"].asString();
+        GetVarifyRsp rsp = VarifyGrpcClient::GetInstance()->GetVarifyCode(email);
         std::cout<<"email is "<<email<<std::endl;
-        root["error"]=0;
+        root["error"]=rsp.error();
         root["email"]=src_root["email"];
-        Json::StreamWriterBuilder writer;
-        std::string jsonstr = Json::writeString(writer, root);
+        std::string jsonstr = root.toStyledString();
         beast::ostream(connection->_response.body())<<jsonstr;
         return true;
     });
