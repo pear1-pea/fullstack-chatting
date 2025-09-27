@@ -3,10 +3,10 @@
 
 #include <grpcpp/client_context.h>
 #include <grpcpp/grpcpp.h>
-#include "message.grpc.pb.h"
+#include "../generated/message.grpc.pb.h"
 #include "const.h"
 #include "Singleton.h"
-#include "message.pb.h"
+#include "../generated/message.pb.h"
 
 using grpc::Channel;
 using grpc::Status;
