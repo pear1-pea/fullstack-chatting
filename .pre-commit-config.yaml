@@ -1,0 +1,53 @@
+# .pre-commit-config.yaml
+repos:
+  # 基础检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: \.(md|rst)$
+      - id: end-of-file-fixer
+        exclude: \.(md|rst)$
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+  # C++ 代码格式化
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v16.0.6
+    hooks:
+      - id: clang-format
+        args: [--style=file]
+        files: \.(c|cc|cxx|cpp|h|hpp|hxx)$
+
+  # CMake 格式化（可选）
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+        args: [--in-place]
+      - id: cmake-lint
+
+  # 检查 C++ 代码中的常见问题（可选）
+  - repo: local
+    hooks:
+      - id: cpp-check-includes
+        name: Check C++ includes
+        entry: bash -c 'grep -n "^#include <.*\.h>" server/**/*.cpp server/**/*.h || true'
+        language: system
+        files: \.(cpp|hpp|h)$
+        pass_filenames: false
+
+# 配置选项
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+
+# 排除的文件和目录
+exclude: |
+  (?x)^(
+    build/.*|
+    \.git/.*|
+    third_party/.*
+  )$

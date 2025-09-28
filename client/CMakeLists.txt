@@ -12,99 +12,65 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network)
 # find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
 
-find_package(Qt6 COMPONENTS Widgets Network REQUIRED)
+find_package(
+  Qt6
+  COMPONENTS Widgets Network
+  REQUIRED)
 # 自动收集 src 目录下所有源码文件
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
-    src/*.cpp
-    src/*.h
-    src/*.ui
-)
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h src/*.ui)
 
 # set(MACOSX_BUNDLE_ICON_FILE head.icns)
-# set_source_files_properties(${CMAKE_SOURCE_DIR}/res/head.icns
-#     PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+# set_source_files_properties(${CMAKE_SOURCE_DIR}/res/head.icns PROPERTIES
+# MACOSX_PACKAGE_LOCATION "Resources")
 
-# if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-#     qt_add_executable(fullstack-chatting
-#         MANUAL_FINALIZATION
-#         MACOSX_BUNDLE
-#         ${PROJECT_SOURCES}
-#         res/rc.qrc
-#     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET fullstack-chatting APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-# else()
-#     if(ANDROID)
-#         add_library(fullstack-chatting SHARED
-#             ${PROJECT_SOURCES}
-#         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-#     else()
-#         add_executable(fullstack-chatting
-#             ${PROJECT_SOURCES}
-#         )
-#     endif()
-# endif()
+# if(${QT_VERSION_MAJOR} GREATER_EQUAL 6) qt_add_executable(fullstack-chatting
+# MANUAL_FINALIZATION MACOSX_BUNDLE ${PROJECT_SOURCES} res/rc.qrc ) Define
+# target properties for Android with Qt 6 as: set_property(TARGET
+# fullstack-chatting APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+# ${CMAKE_CURRENT_SOURCE_DIR}/android) For more information, see
+# https://doc.qt.io/qt-6/qt-add-executable.html#target-creation else()
+# if(ANDROID) add_library(fullstack-chatting SHARED ${PROJECT_SOURCES} ) Define
+# properties for Android with Qt 5 after find_package() calls as:
+# set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android") else()
+# add_executable(fullstack-chatting ${PROJECT_SOURCES} ) endif() endif()
 
 # target_sources(fullstack-chatting PRIVATE ${CMAKE_SOURCE_DIR}/res/head.icns)
 
-set(PROJECT_RESOURCES
-    res/rc.qrc
-)
-add_executable(client
-    ${PROJECT_SOURCES}
-    ${PROJECT_RESOURCES}
-)
-target_link_libraries(client
-    PRIVATE
-        Qt6::Widgets
-        Qt6::Network
-)
+set(PROJECT_RESOURCES res/rc.qrc)
+add_executable(client ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
+target_link_libraries(client PRIVATE Qt6::Widgets Qt6::Network)
 
-# 配置文件拷贝
-# if(APPLE)
-#     set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:client>/../Resources")
-# else()
-#     set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:client>")
-# endif()
+# 配置文件拷贝 if(APPLE) set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:client>/../Resources")
+# else() set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:client>") endif()
 set(CONFIG_DEST_DIR "$<TARGET_FILE_DIR:client>")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 target_include_directories(client PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-add_custom_command(TARGET client POST_BUILD
-    # COMMAND ${CMAKE_COMMAND} -E make_directory "${CONFIG_DEST_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/config.ini"
-        "${CONFIG_DEST_DIR}/config.ini"
-    COMMENT "Copying config.ini to output directory"
-)
+add_custom_command(
+  TARGET client
+  POST_BUILD
+  # COMMAND ${CMAKE_COMMAND} -E make_directory "${CONFIG_DEST_DIR}"
+  COMMAND
+    ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_SOURCE_DIR}/config.ini" "${CONFIG_DEST_DIR}/config.ini"
+  COMMENT "Copying config.ini to output directory")
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-# if(${QT_VERSION} VERSION_LESS 6.1.0)
-#   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.fullstack-chatting)
-# endif()
-# set_target_properties(fullstack-chatting PROPERTIES
-#     ${BUNDLE_ID_OPTION}
-#     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-#     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-#     MACOSX_BUNDLE TRUE
-#     WIN32_EXECUTABLE TRUE
-# )
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1. If
+# you are developing for iOS or macOS you should consider setting an explicit,
+# fixed bundle identifier manually though. if(${QT_VERSION} VERSION_LESS 6.1.0)
+# set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER
+# com.example.fullstack-chatting) endif()
+# set_target_properties(fullstack-chatting PROPERTIES ${BUNDLE_ID_OPTION}
+# MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+# MACOSX_BUNDLE_SHORT_VERSION_STRING
+# ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} MACOSX_BUNDLE TRUE
+# WIN32_EXECUTABLE TRUE )
 
-# include(GNUInstallDirs)
-# install(TARGETS fullstack-chatting
-#     BUNDLE DESTINATION .
-#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-# )
+# include(GNUInstallDirs) install(TARGETS fullstack-chatting BUNDLE DESTINATION
+# . LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION
+# ${CMAKE_INSTALL_BINDIR} )
 
-# if(QT_VERSION_MAJOR EQUAL 6)
-#     qt_finalize_executable(fullstack-chatting)
+# if(QT_VERSION_MAJOR EQUAL 6) qt_finalize_executable(fullstack-chatting)
 # endif()
